@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모바일 UI</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: white;
+        }
+
+        .header {
+            position: relative;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .navbar {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 0;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .navbar-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .navbar-item p {
+            margin: 0;
+        }
+
+        .navbar-item img:hover,
+        .navbar-item p:hover {
+            color: #ddd;
+        }
+
+        .content {
+            padding: 20px;
+            margin-bottom: 60px;
+        }
+
+        .report_button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 15px 400px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: block;
+            cursor: pointer;
+        }
+
+        .current_reported_button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 15px 500px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: block;
+            cursor: pointer;
+        }
+
+        .ranking-button {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 15px 400px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: block;
+            cursor: pointer;
+        }
+
+        .ranking-button:hover {
+            background-color: darkgreen;
+        }
+
+        .ranking-container {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+
+        .ranking-item:last-child {
+            border-bottom: none;
+        }
+
+        .ranking-item span {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .ranking-item .rank {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .ranking-item .user {
+            flex-grow: 1;
+            text-align: left;
+            padding-left: 20px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        #chart-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto; 
+            text-align: center;
+        }
+        
+        .map-container {
+            width: 95%;
+            height: 500px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-container {
+            width: 95%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .notification-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000; 
+        }
+        
+        .notification-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .notification-button img {
+            width: 30px;
+            height: 30px;
+        }
+        .notification-list {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .notification-list ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .notification-list ul li {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .notification-list ul li:last-child {
+            border-bottom: none;
+        }
+        
+        .delete-all-button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPtz7D6KyJu42448k2vjhSakyDgP1e1EU&libraries=visualization"></script>
+</head>
+<body>
+    <div class="header">
+
+<div id="notification-container" class="notification-container" style="display: none;">
+    <button id="notification-button" class="notification-button">
+        <img src="bell.png" alt="알림 버튼" />
+    </button>
+    <div id="notification-list" class="notification-list" style="display: none;">
+        <ul id="notifications"></ul>
+        <button id="delete-all-button" class="delete-all-button">모든 알림 삭제</button>
+    </div>
+</div>
+        <h1>전동 킥보드 주정차 위반 신고
+            <img src="profile.png"  align="right" width="50px" id="profileButton">
+        </h1>
+    </div>
+
+    <div class="content">
+        <p style="text-align: center"><img src="kick_board.png"></p>
+        <h1>&nbsp;&nbsp;&nbsp;유저 랭킹</h1>
+        <div id="ranking-container" class="ranking-container">
+            <p class="empty-message">랭킹 데이터를 로드 중입니다...</p>
+        </div>
+
+        <h1>&nbsp&nbsp&nbsp월별 신고 처리 현황</h1>
+        <div id="chart-container">
+            <canvas id="monthlyReportChart"></canvas>
+        </div>
+        <h1>&nbsp&nbsp&nbsp신고 위치 히트맵</h1>
+        <div class="map-container" id="heatmap"></div>
+        
+        
+        <h1>&nbsp&nbsp&nbsp신고 빈도 높은 지역</h1>
+        <div class="content-container">
+            <div id="loading" class="loading">데이터를 불러오는 중...</div>
+            <table id="reportTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>지역</th>
+                        <th>세부 주소</th>
+                        <th>신고 수</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+
+
+
+    <div class="navbar">
+        <div class="navbar-item">
+            <img src="home_icon.png" alt="홈" onclick="goHome()">
+            <p>홈</p>
+        </div>
+        <div class="navbar-item">
+            <img src="report_icon.png" alt="신고하기" id="reportOrManageButtonImg">
+            <p id="reportOrManageButtonText">신고하기</p>
+        </div>        
+        <div class="navbar-item">
+            <img src="menu_icon.png" alt="메뉴" onclick="goRecent()">
+            <p>최근 신고 현황</p>
+        </div>
+        <div class="navbar-item">
+            <img src="profile_icon.png" id="auth-button-img"alt="로그인" onclick="goLogin()">
+            <p id="auth-button">로그인</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQA1E9VdM0kcIrp8_TqYNF1EdiPshtaSc",
+            authDomain: "softwareproject2-4e1af.firebaseapp.com",
+            databaseURL: "https://softwareproject2-4e1af-default-rtdb.firebaseio.com/",
+            projectId: "softwareproject2-4e1af",
+            storageBucket: "softwareproject2-4e1af.appspot.com",
+            messagingSenderId: "464612569406",
+            appId: "1:464612569406:web:d9a63971429dc28adaf6cf",
+            measurementId: "G-2800CRF5SM"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        const db = firebase.database();
+
+        function loadRanking() {
+            const reportsRef = db.ref('reports');
+            const ranking = {}; 
+
+            reportsRef.once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const report = childSnapshot.val();
+                    const userId = report.userId;
+
+                    if (ranking[userId]) {
+                        ranking[userId]++;
+                    } else {
+                        ranking[userId] = 1;
+                    }
+                });
+                const sortedRanking = Object.entries(ranking)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10); 
+
+                displayRanking(sortedRanking);
+            });
+        }
+
+        function displayRanking(sortedRanking) {
+            const rankingContainer = document.getElementById('ranking-container');
+            rankingContainer.innerHTML = '';
+
+            if (sortedRanking.length === 0) {
+                rankingContainer.innerHTML = '<p class="empty-message">표시할 랭킹 데이터가 없습니다.</p>';
+                return;
+            }
+
+            sortedRanking.forEach(([userId, count], index) => {
+                const rankItem = document.createElement('div');
+                rankItem.classList.add('ranking-item');
+                rankItem.innerHTML = `
+                    <span class="rank">${index + 1}위</span>
+                    <div class="user">${userId}</div>
+                    <span>${count}건</span>
+                `;
+                rankingContainer.appendChild(rankItem);
+            });
+        }
+
+        loadRanking();
+
+        window.onload = function () {
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            const userType = sessionStorage.getItem('userType'); 
+            const authButton = document.getElementById('auth-button');
+            const authButtonImg = document.getElementById('auth-button-img');
+            const reportOrManageButtonImg = document.getElementById('reportOrManageButtonImg');
+            const reportOrManageButtonText = document.getElementById('reportOrManageButtonText');
+            const profileButton = document.getElementById('profileButton');
+            const notificationContainer = document.getElementById('notification-container');
+            const notificationButton = document.getElementById('notification-button');
+
+        
+            if (loggedInUser) {
+                authButton.innerText = '로그아웃';
+                authButton.onclick = function () {
+                    sessionStorage.removeItem('loggedInUser');
+                    sessionStorage.removeItem('userType'); 
+                    alert('로그아웃되었습니다.');
+                    window.location.href = 'UI.html';  
+                };
+                authButtonImg.onclick = authButton.onclick;
+        
+                profileButton.onclick = function() {
+                    window.location.href = 'Profile.html';
+                };
+        
+                if (userType === 'localgovern_user') {
+                    reportOrManageButtonText.innerText = '신고 관리 페이지로 이동';
+                    reportOrManageButtonImg.onclick = function () {
+                        window.location.href = 'Management2.html';
+                    };
+                } else if (userType === 'normal_user') {
+                    reportOrManageButtonText.innerText = '신고하기';
+                    reportOrManageButtonImg.onclick = function () {
+                        window.location.href = 'Report.html';
+                    };
+                }
+        
+                if (notificationContainer) {
+                    notificationContainer.style.display = 'block'; 
+                }
+            } else {
+                reportOrManageButtonText.innerText = '신고하기';
+                reportOrManageButtonImg.onclick = function () {
+                    alert('로그인이 필요합니다!');
+                    window.location.href = 'Login.html';
+                };
+                
+                reportOrManageButtonText.onclick = function () {
+                    alert('로그인이 필요합니다!');
+                    window.location.href = 'Login.html';
+                };
+                authButton.innerText = '로그인';
+                authButton.onclick = function () {
+                    window.location.href = 'Login.html'; 
+                };
+        
+                profileButton.onclick = function() {
+                    alert('로그인이 필요합니다.');
+                    window.location.href = 'Login.html';
+                };
+        
+                if (notificationContainer) {
+                    notificationContainer.style.display = 'none';
+                }
+            }
+        };
+        document.addEventListener("DOMContentLoaded", function () {
+            const db = firebase.database();
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            const userType = sessionStorage.getItem('userType'); 
+            const notificationButton = document.getElementById('notification-button');
+            const notificationList = document.getElementById('notification-list');
+            const notificationsUl = document.getElementById('notifications');
+            const deleteAllButton = document.getElementById('delete-all-button');
+            let notifications = [];
+        
+            function listenForUserNotifications() {
+                if (!loggedInUser) return;
+        
+                db.ref('notifications')
+                    .orderByChild('userId')
+                    .equalTo(loggedInUser)
+                    .on('child_added', (snapshot) => {
+                        const notification = snapshot.val();
+                        notifications.push({
+                            id: snapshot.key,
+                            message: notification.message,
+                            timestamp: notification.timestamp,
+                            read: notification.read,
+                        });
+                        renderNotifications();
+                    });
+            }
+        
+            function listenForAdminNotifications() {
+                if (!loggedInUser) return;
+        
+                db.ref('reports')
+                    .orderByChild('status')
+                    .equalTo('접수')
+                    .on('value', (snapshot) => {
+                        notifications = [];
+                        let extraCount = 0;
+        
+                        snapshot.forEach(childSnapshot => {
+                            const report = childSnapshot.val();
+                            if (notifications.length < 5) {
+                                notifications.push({
+                                    id: childSnapshot.key,
+                                    message: `신고번호 ${report.reportNumber}번이 접수중입니다.`,
+                                    timestamp: report.timestamp,
+                                });
+                            } else {
+                                extraCount++;
+                            }
+                        });
+        
+                        renderAdminNotifications(extraCount);
+                    });
+            }
+        
+            function renderNotifications() {
+                notificationsUl.innerHTML = '';
+                if (notifications.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = '표시할 알림이 없습니다.';
+                    notificationsUl.appendChild(li);
+                } else {
+                    notifications.forEach((notification) => {
+                        const li = document.createElement('li');
+                        li.textContent = notification.message;
+                        notificationsUl.appendChild(li);
+                    });
+                }
+            }
+        
+            function renderAdminNotifications(extraCount = 0) {
+                notificationsUl.innerHTML = '';
+                if (notifications.length === 0 && extraCount === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = '모든 신고가 처리되었습니다.';
+                    li.style.fontStyle = 'italic';
+                    notificationsUl.appendChild(li);
+                } else {
+                    notifications.forEach((notification) => {
+                        const li = document.createElement('li');
+                        li.textContent = notification.message;
+                        notificationsUl.appendChild(li);
+                    });
+        
+                    if (extraCount > 0) {
+                        const extraLi = document.createElement('li');
+                        extraLi.textContent = `+${extraCount}개의 추가 신고가 접수중입니다.`;
+                        extraLi.style.fontWeight = 'bold';
+                        notificationsUl.appendChild(extraLi);
+                    }
+                }
+            }
+        
+            function deleteAllNotifications() {
+                if (!loggedInUser || userType !== 'normal_user') return;
+        
+                const userNotificationsRef = db.ref('notifications').orderByChild('userId').equalTo(loggedInUser);
+                userNotificationsRef.once('value')
+                    .then(snapshot => {
+                        snapshot.forEach(childSnapshot => {
+                            childSnapshot.ref.remove();
+                        });
+                        notifications = [];
+                        renderNotifications();
+                        alert('모든 알림이 삭제되었습니다.');
+                    })
+                    .catch(error => {
+                        console.error('알림 삭제 중 오류 발생:', error);
+                    });
+            }
+
+            notificationButton.addEventListener('click', function () {
+                if (notificationList.style.display === 'none') {
+                    notificationList.style.display = 'block';
+                    if (userType === 'normal_user') {
+                        renderNotifications();
+                    } else if (userType === 'localgovern_user') {
+                        renderAdminNotifications();
+                    }
+                } else {
+                    notificationList.style.display = 'none';
+                }
+            });
+        
+            deleteAllButton.addEventListener('click', deleteAllNotifications);
+        
+            if (userType === 'normal_user') {
+                listenForUserNotifications();
+            } else if (userType === 'localgovern_user') {
+                listenForAdminNotifications();
+                deleteAllButton.style.display = 'none'; 
+            }
+        });
+        
+        
+        function loadMonthlyReports() {
+            const reportsRef = db.ref('reports');
+            const monthlyData = {};
+
+            reportsRef.once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const report = childSnapshot.val();
+                    const timestamp = report.timestamp; 
+
+                    if (!timestamp) {
+                        console.warn("timestamp 필드가 없는 데이터:", report);
+                        return; 
+                    }
+
+                    const date = new Date(timestamp); 
+                    const year = date.getFullYear(); 
+                    const month = date.getMonth() + 1; 
+                    const formattedMonth = `${year}-${month < 10 ? '0' + month : month}`; 
+                    if (monthlyData[formattedMonth]) {
+                        monthlyData[formattedMonth]++;
+                    } else {
+                        monthlyData[formattedMonth] = 1;
+                    }
+                });
+
+                displayChart(monthlyData);
+            });
+        }
+
+        function displayChart(data) {
+            const ctx = document.getElementById('monthlyReportChart').getContext('2d');
+            const labels = Object.keys(data).sort(); 
+            const values = labels.map(label => data[label]);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '신고 처리 수',
+                        data: values,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '신고 처리 수'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '월'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function initMap() {  
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    const map = new google.maps.Map(document.getElementById('heatmap'), {
+                        center: userLocation,
+                        zoom: 12,
+                        mapTypeId: 'roadmap'
+                    });
+
+                    loadHeatMapData(map);
+                }, function () {
+                    alert("위치 정보를 가져올 수 없습니다. 기본 위치로 설정합니다.");
+                    const defaultLocation = { lat: 37.5665, lng: 126.9780 };
+                    const map = new google.maps.Map(document.getElementById('heatmap'), {
+                        center: defaultLocation,
+                        zoom: 12,
+                        mapTypeId: 'roadmap'
+                    });
+
+                    loadHeatMapData(map);
+                });
+            } else {
+                alert("브라우저가 위치 정보를 지원하지 않습니다.");
+                const defaultLocation = { lat: 37.5665, lng: 126.9780 };
+                const map = new google.maps.Map(document.getElementById('heatmap'), {
+                    center: defaultLocation,
+                    zoom: 12,
+                    mapTypeId: 'roadmap'
+                });
+
+                loadHeatMapData(map);
+            }
+        }
+
+        function loadHeatMapData(map) {
+            fetch('http://127.0.0.1:3000/get-reports')
+                .then(response => response.json())
+                .then(data => {
+                    const geocoder = new google.maps.Geocoder();
+                    const heatmapData = [];
+
+                    data.forEach((report, index) => {
+                        geocoder.geocode({ address: report.address }, function(results, status) {
+                            if (status === 'OK') {
+                                const location = results[0].geometry.location;
+                                console.log(`Geocoded address: ${report.address} to Lat: ${location.lat()}, Lng: ${location.lng()}`);
+                                heatmapData.push(new google.maps.LatLng(location.lat(), location.lng()));
+
+                                if (heatmapData.length === data.length) {
+                                    console.log('Generating heatmap with', heatmapData.length, 'data points');
+                                    const heatmap = new google.maps.visualization.HeatmapLayer({
+                                        data: heatmapData,
+                                        map: map,
+                                        radius: 30
+                                    });
+                                }
+                            } else {
+                                console.error('Geocoding error for address:', report.address, 'Status:', status);
+                            }
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('데이터 로드 중 오류 발생:', error);
+                    alert('데이터를 불러오는 중 문제가 발생했습니다.');
+                });
+        }
+
+        function loadFrequentRegions() {
+            const reportsRef = firebase.database().ref('reports');
+            const regionCounts = {}; 
+
+            reportsRef.once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const report = childSnapshot.val();
+                    const address = report.address; 
+                    const simplifiedAddress = simplifyAddress(address); 
+
+                    if (!simplifiedAddress) return;
+
+                    if (regionCounts[simplifiedAddress]) {
+                        regionCounts[simplifiedAddress]++;
+                    } else {
+                        regionCounts[simplifiedAddress] = 1;
+                    }
+                });
+
+                const topRegions = Object.entries(regionCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10);
+                displayTopRegions(topRegions); 
+            });
+        }
+
+        function simplifyAddress(address) {
+            if (!address) return null;
+
+            const regionMatch = address.match(/대한민국\s[\w가-힣]+\s[\w가-힣]+/); 
+            const detailMatch = address.match(/[\w가-힣]+\d*(길|로|리)/); 
+
+            const region = regionMatch ? regionMatch[0] : "대한민국";
+            const detail = detailMatch ? detailMatch[0] : "상세 주소 없음";
+
+            return `${region}, ${detail}`; 
+        }
+
+        function displayTopRegions(topRegions) {
+            const table = document.getElementById('reportTable');
+            const tbody = table.querySelector('tbody');
+            const loading = document.getElementById('loading');
+
+            loading.style.display = 'none';
+
+            table.style.display = 'table';
+
+            topRegions.forEach(([address, count], index) => {
+                const [region, detail] = address.split(', '); 
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${region}</td>
+                    <td>${detail}</td>
+                    <td>${count}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initMap();
+            loadMonthlyReports();
+            loadFrequentRegions();
+        });
+        
+        function goHome() { alert('홈으로 이동합니다!'); window.location.href = 'UI.html'; }
+        function goLogin() { alert('로그인 화면으로 이동합니다!'); window.location.href = 'login.html'; }
+        function goBack() { alert('뒤로 가기'); window.history.back(); }
+        function menu() { alert('메뉴화면으로 이동합니다.'); window.location.href = 'menu.html'; }
+        function profile() { alert('프로필 화면으로 이동합니다.'); window.location.href = 'Profile_Test.html'; }
+        function goRecent() { window.location.href = 'Recent.html'; }
+        function goToRanking() { window.location.href = 'Ranking.html'; }
+    </script>
+</body>
+</html>

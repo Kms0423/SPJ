@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        .navbar {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 0;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .navbar-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .navbar-item p {
+            margin: 0;
+        }
+
+        .navbar-item img:hover,
+        .navbar-item p:hover {
+            color: #ddd;
+        }
+        
+        * {
+            padding: 0;
+            margin: 0;
+            border: none;
+        }
+
+        body {
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .login-wrapper {
+            width: 400px;
+            height: 380px;
+            padding: 40px;
+            box-sizing: border-box;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        
+        .login-wrapper > h2 {
+            font-size: 24px;
+            color: #6A24FE;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        #login-form > input {
+            width: 100%;
+            height: 48px;
+            padding: 0 10px;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            background-color: #F8F8F8;
+            border: 1px solid #ddd;
+        }
+        
+        #login-form > input::placeholder {
+            color: #D2D2D2;
+        }
+        
+        #login-form > input[type="submit"] {
+            color: #fff;
+            font-size: 16px;
+            background-color: #6A24FE;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        
+        #login-form > input[type="submit"]:hover {
+            background-color: #5a1fde;
+        }
+        
+        .signup-prompt {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .signup-prompt a {
+            color: #6A24FE;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .signup-prompt a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-item">
+            <img src="home_icon.png" alt="홈" onclick="goHome()">
+            <p>홈</p>
+        </div>
+    </div>
+
+    <script>
+        function goHome() {
+            alert('홈으로 이동합니다!');
+            window.location.href = 'UI.html';
+        }
+
+        function goBack() {
+            alert('뒤로 가기');
+            window.history.back();
+        }
+
+        function goToSignUp() {
+            alert('회원가입 페이지로 이동합니다.');
+            window.location.href = 'SignUp.html';  
+        }
+    </script> 
+
+    <div class="login-wrapper">
+        <h2>Login</h2>
+        <form id="login-form" onsubmit="loginUser(event)">
+            <input type="text" id="userEmail" placeholder="Email" required>
+            <input type="password" id="userPassword" placeholder="Password" required>
+            <input type="submit" value="Login">
+        </form>
+        <div class="signup-prompt">
+            아직 회원이 아니시라면? <a onclick="goToSignUp()">회원가입</a>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDQa1E9VdM0kcIrp8_TqYNF1EdiPshtaSc",
+        authDomain: "softwareproject2-4e1af.firebaseapp.com",
+        databaseURL: "https://softwareproject2-4e1af-default-rtdb.firebaseio.com",
+        projectId: "softwareproject2-4e1af",
+        storageBucket: "softwareproject2-4e1af.appspot.com",
+        messagingSenderId: "464612569406",
+        appId: "1:464612569406:web:d9a63971429dc28adafc6f",
+        measurementId: "G-2800CRF5SM"
+      };
+      
+      firebase.initializeApp(firebaseConfig);
+
+      function loginUser(event) {
+        event.preventDefault(); 
+        const email = document.getElementById('userEmail').value;
+        const password = document.getElementById('userPassword').value;
+
+        firebase.database().ref('users').orderByChild('userId').equalTo(email).once('value', snapshot => {
+            if (snapshot.exists()) {
+                snapshot.forEach(userSnapshot => {
+                    const userData = userSnapshot.val();
+                    const storedPassword = userData.password;  
+
+                    if (password === storedPassword) {                    
+                        sessionStorage.setItem('loggedInUser', email);             
+                        sessionStorage.setItem('userType', userData.userType);
+                        alert('로그인 성공! 환영합니다, ' + userData.userId);
+                        window.location.href = 'UI.html';   
+                    } else {
+                        alert('로그인 실패: 비밀번호가 일치하지 않습니다.');
+                    }
+                });
+            } else {
+                alert('로그인 실패: 해당 이메일을 찾을 수 없습니다.');
+            }
+        });
+      }
+    </script>
+</body>
+</html>

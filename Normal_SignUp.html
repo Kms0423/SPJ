@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .navbar {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 0;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .navbar-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .navbar-item p {
+            margin: 0;
+        }
+
+        .navbar-item img:hover,
+        .navbar-item p:hover {
+            color: #ddd;
+        }
+
+        .signup-container {
+            width: 450px;
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .signup-container h1 {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .checkbox-group {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+
+        .submit-btn {
+            background-color: purple;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: darkviolet;
+        }
+    </style>
+    
+</head>
+<body>
+ 
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-firestore.js"></script>
+    <script>
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDQa1E9VdM0kcIrp8_TqYNF1EdiPshtaSc",
+        authDomain: "softwareproject2-4e1af.firebaseapp.com",
+        databaseURL: "https://softwareproject2-4e1af-default-rtdb.firebaseio.com",
+        projectId: "softwareproject2-4e1af",
+        storageBucket: "softwareproject2-4e1af.appspot.com",
+        messagingSenderId: "464612569406",
+        appId: "1:464612569406:web:d9a63971429dc28adafc6f"
+      };
+    
+        firebase.initializeApp(firebaseConfig);
+        
+        const database = firebase.database();
+        
+        function Upload_User_Infrom() {
+
+            const userId = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm').value;
+
+            if (password !== passwordConfirm) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return;
+            }
+
+         
+            const userType = 'normal_user';
+
+            // Firebase 데이터베이스에 저장
+            const userRef = database.ref('users').push();
+            userRef.set({
+                userId: userId,
+                password: password,  // 실제 구현에서는 해시 처리를 사용해야 함
+                userType: userType
+            })
+            .then(() => {
+                alert('회원가입 성공!');
+                // 리다이렉션 또는 다른 작업 수행
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('회원가입 중 오류가 발생했습니다.');
+            });
+        }
+
+        function goHome() { alert('홈으로 이동합니다!'); window.location.href = 'UI.html'; }
+        function goLogin() { alert('로그인 화면으로 이동합니다!'); window.location.href = 'login.html'; }
+        function goBack() { alert('뒤로 가기'); window.history.back(); }
+        function menu() { alert('메뉴화면으로 이동합니다.'); window.location.href = 'menu.html'; }
+    </script>
+
+    <div class="signup-container">
+        <h1>회원가입</h1>
+
+        <form>
+            <!-- 아이디 입력 -->
+            <div class="form-group">
+                <label for="email">아이디</label>
+                <input type="email" id="email" placeholder="아이디를 입력해 주세요." required>
+            </div>
+
+            <!-- 비밀번호 입력 -->
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" placeholder="대소문자 숫자가 포함된 8~16자 이내" required>
+                <p class="error-message">영문 포함, 특수문자 포함, 숫자 포함, 8자리 이상 16자리 이하</p>
+            </div>
+
+            <!-- 비밀번호 확인 -->
+            <div class="form-group">
+                <label for="password-confirm">비밀번호 확인</label>
+                <input type="password" id="password-confirm" placeholder="비밀번호를 확인해 주세요." required>
+            </div>
+
+            <!-- 이용약관 동의 -->
+            <div class="checkbox-group">
+                <input type="checkbox" id="agree-all">
+                <label for="agree-all">전체 동의하기</label>
+                <br>
+                <input type="checkbox" id="agree-service">
+                <label for="agree-service">[필수] 서비스 이용약관</label>
+                <br>
+                <input type="checkbox" id="agree-finance">
+                <label for="agree-finance">[필수] 전자금융거래 이용약관</label>
+                <br>
+                <input type="checkbox" id="agree-privacy">
+                <label for="agree-privacy">[필수] 개인정보 처리방침</label>
+            </div>
+
+            <!-- 회원가입 버튼 -->
+            <button type="button" class="submit-btn" onclick="Upload_User_Infrom()">회원가입</button>
+        </form>
+    </div>
+    <div class="navbar">
+        <div class="navbar-item">
+            <img src="home_icon.png" alt="홈" onclick="goHome()">
+            <p>홈</p>
+        </div>
+              
+        <div class="navbar-item">
+            <img src="menu_icon.png" alt="메뉴" onclick="menu()">
+            <p>메뉴</p>
+        </div>
+        
+    </div>
+    
+</body>
+</html>

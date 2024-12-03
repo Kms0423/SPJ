@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모바일 UI</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header h1{
+            margin:0;
+            font-size:20px;
+        }
+
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .navbar button, .navbar img {
+            background-color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .navbar img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .navbar button:hover, .navbar img:hover {
+            background-color: #ddd;
+        }
+
+        .content {
+            padding: 20px;
+            margin-bottom: 60px;
+        }
+
+        
+        
+    </style>
+    </head>
+    <body>
+        <h1 style="text-align: center">메뉴 테스트</h1>
+        <div class="navbar">
+            <button onclick="login()">로그인</button>
+            <img src="home.png" alt="홈" onclick="goHome()">
+            <img src="go_back.png" alt="뒤로가기" onclick="goBack()">
+        </div>
+    
+        <script>
+            function goHome() {
+                alert('홈으로 이동합니다!');
+                
+                window.location.href = 'UI.html';
+            }
+    
+            function goBack() {
+                alert('뒤로 가기');
+                window.history.back();
+            }
+    
+            function menu() {
+                alert('메뉴화면으로 이동합니다.');
+                window.location.href = 'menu.html';
+            }
+    
+            function report() {
+                alert('신고화면으로 이동합니다.');
+                window.location.href = 'Report.html';
+            }
+    
+            function login() {
+                alert('로그인 화면으로 이동합니다.');
+                window.location.href = 'Login.html';
+            }
+        </script>
+    </body>
+</html>

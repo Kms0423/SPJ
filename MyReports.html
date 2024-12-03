@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 신고 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .navbar button, .navbar img {
+            background-color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .navbar img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .navbar button:hover, .navbar img:hover {
+            background-color: #ddd;
+        }
+
+        .report-list {
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .report-item {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .report-image {
+            width: 120px; 
+            height: auto;
+            margin-right: 15px; 
+            border-radius: 8px;
+        }
+
+        .report-details {
+            flex: 1; 
+        }
+
+        .report-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .report-status {
+            color: green;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; color:#333;">내 신고 목록</h1>
+    <div class="report-list" id="reportList"></div>
+
+    <div class="navbar">
+        <button onclick="goBack()">뒤로가기</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+       const firebaseConfig = {
+            apiKey: "AIzaSyDQA1E9VdM0kcIrp8_TqYNF1EdiPshtaSc",
+            authDomain: "softwareproject2-4e1af.firebaseapp.com",
+            databaseURL: "https://softwareproject2-4e1af-default-rtdb.firebaseio.com/",
+            projectId: "softwareproject2-4e1af",
+            storageBucket: "softwareproject2-4e1af.appspot.com",
+            messagingSenderId: "464612569406",
+            appId: "1:464612569406:web:d9a63971429dc28adaf6cf",
+            measurementId: "G-2800CRF5SM"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const userId = sessionStorage.getItem('loggedInUser');
+
+        function loadUserReports() {
+            const reportList = document.getElementById('reportList');
+
+            firebase.database().ref('reports').orderByChild('userId').equalTo(userId).once('value', snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(reportSnapshot => {
+                        const report = reportSnapshot.val();
+                        const reportItem = document.createElement('div');
+                        reportItem.classList.add('report-item');
+
+                        if (report.imageUrl) {
+                            const image = document.createElement('img');
+                            image.src = report.imageUrl;
+                            image.alt = '신고 사진';
+                            image.classList.add('report-image');
+                            reportItem.appendChild(image);
+                        }
+
+                        const reportDetails = document.createElement('div');
+                        reportDetails.classList.add('report-details');
+                        reportDetails.innerHTML = `
+                            <div class="report-title">신고번호: ${report.reportNumber}</div>
+                            <div>주소: ${report.address}</div>
+                            <div>설명: ${report.description}</div>
+                            <div>신고 유형: ${report.reportType}</div>
+                            <div class="report-status">처리 상태: ${report.status}</div>
+                            <div>신고자 ID: ${report.userId}</div>
+                        `;
+                        reportItem.appendChild(reportDetails);
+
+                        reportList.appendChild(reportItem);
+                    });
+                } else {
+                    reportList.innerHTML = "<p>신고 내역이 없습니다.</p>";
+                }
+            }).catch(error => {
+                console.error("데이터 로드 중 오류 발생:", error);
+                alert("신고 데이터를 불러오는 중 문제가 발생했습니다.");
+            });
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        window.onload = loadUserReports;
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .signup-container {
+            width: 450px;
+            background-color: white;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .signup-container h1 {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .signup-step {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .signup-step span {
+            background-color: purple;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .signup-step p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group .hint {
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .form-group .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .form-group .btn-verify {
+            margin-top: 10px;
+            background-color: white;
+            border: 1px solid #999;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+
+        .submit-btn {
+            background-color: purple;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: darkviolet;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="signup-container">
+        <h1>회원가입</h1>
+
+        <div class="signup-step">
+            
+            <p>가입 정보 입력</p>
+        </div>
+
+        <form>
+    
+            <div class="form-group">
+                <label for="email">아이디</label>
+                <input type="email" id="email" placeholder="아이디를 입력해 주세요.">
+                
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" placeholder="대소문자 숫자가 포함된 8~16자 이내">
+                <p class="error-message">영문 포함, 특수문자 포함, 숫자 포함, 8자리 이상 16자리 이하</p>
+            </div>
+
+            <div class="form-group">
+                <label for="password-confirm">비밀번호 확인</label>
+                <input type="password" id="password-confirm" placeholder="위 비밀번호와 동일하게 입력해 주세요.">
+            </div>
+
+            
+
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="agree-all">
+                <label for="agree-all">전체 동의하기</label>
+                <br>
+                <input type="checkbox" id="agree-service">
+                <label for="agree-service">[필수] 서비스 이용약관</label>
+                <br>
+                <input type="checkbox" id="agree-finance">
+                <label for="agree-finance">[필수] 전자금융거래 이용약관</label>
+                <br>
+                <input type="checkbox" id="agree-privacy">
+                <label for="agree-privacy">[필수] 개인정보 처리방침</label>
+            </div>
+
+
+            <button type="submit" class="submit-btn">다음</button>
+        </form>
+    </div>
+
+</body>
+</html>

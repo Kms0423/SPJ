@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신고 빈도 높은 지역</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .content-container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .navbar img {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>신고 빈도 높은 지역</h1>
+
+    <div class="content-container">
+        <div id="loading" class="loading">데이터를 불러오는 중...</div>
+        <table id="reportTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>순위</th>
+                    <th>지역</th>
+                    <th>세부 주소</th>
+                    <th>신고 수</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="navbar">
+        <img src="home.png" alt="홈" onclick="goHome()">
+        <img src="go_back.png" alt="뒤로가기" onclick="goBack()">
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQA1E9VdM0kcIrp8_TqYNF1EdiPshtaSc",
+            authDomain: "softwareproject2-4e1af.firebaseapp.com",
+            databaseURL: "https://softwareproject2-4e1af-default-rtdb.firebaseio.com/",
+            projectId: "softwareproject2-4e1af",
+            storageBucket: "softwareproject2-4e1af.appspot.com",
+            messagingSenderId: "464612569406",
+            appId: "1:464612569406:web:d9a63971429dc28adaf6cf",
+            measurementId: "G-2800CRF5SM"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        function loadFrequentRegions() {
+            const reportsRef = firebase.database().ref('reports');
+            const regionCounts = {}; 
+
+            reportsRef.once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const report = childSnapshot.val();
+                    const address = report.address; 
+                    const simplifiedAddress = simplifyAddress(address); 
+
+                    if (!simplifiedAddress) return;
+
+                    if (regionCounts[simplifiedAddress]) {
+                        regionCounts[simplifiedAddress]++;
+                    } else {
+                        regionCounts[simplifiedAddress] = 1;
+                    }
+                });
+
+                const topRegions = Object.entries(regionCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10);
+                displayTopRegions(topRegions); 
+            });
+        }
+
+        function simplifyAddress(address) {
+            if (!address) return null;
+
+            const regionMatch = address.match(/대한민국\s[\w가-힣]+\s[\w가-힣]+/); 
+            const detailMatch = address.match(/[\w가-힣]+\d*(길|로|리)/); 
+
+            const region = regionMatch ? regionMatch[0] : "대한민국";
+            const detail = detailMatch ? detailMatch[0] : "상세 주소 없음";
+
+            return `${region}, ${detail}`; 
+        }
+
+        function displayTopRegions(topRegions) {
+            const table = document.getElementById('reportTable');
+            const tbody = table.querySelector('tbody');
+            const loading = document.getElementById('loading');
+
+            loading.style.display = 'none';
+
+            table.style.display = 'table';
+
+            topRegions.forEach(([address, count], index) => {
+                const [region, detail] = address.split(', '); 
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${region}</td>
+                    <td>${detail}</td>
+                    <td>${count}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function goHome() {
+            alert('홈으로 이동합니다!');
+            window.location.href = 'UI.html';
+        }
+
+        function goBack() {
+            alert('뒤로 가기');
+            window.history.back();
+        }
+
+        loadFrequentRegions();
+    </script>
+</body>
+</html>

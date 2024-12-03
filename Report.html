@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신고 페이지</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            padding: 20px;
+        }
+        .map-container {
+            width: 80%;
+            height: 500px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 0;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .navbar-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .navbar-item p {
+            margin: 0;
+        }
+
+        .navbar-item img:hover,
+        .navbar-item p:hover {
+            color: #ddd;
+        }
+
+        
+
+        .address {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .report_button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 15px 100px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: block;
+            cursor: pointer;
+        }
+        .upload_section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .upload_section label {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .description_input {
+            width: 80%;
+            height: 200px;
+            margin: 20px auto;
+            display: block;
+            font-size: 16px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPtz7D6KyJu42448k2vjhSakyDgP1e1EU"></script>
+</head>
+<body>
+    <h1>신고 페이지</h1>
+
+    <div class="map-container" id="map"></div>
+    <p id="address" class="address">도로명 주소를 읽어오는 중입니다.</p>
+
+    <div class="upload_section">
+        <label for="chooseFile">사진 업로드</label>
+        <input type="file" id="chooseFile" name="chooseFile" accept="image/*">
+    </div>
+
+    <textarea id="description" class="description_input" placeholder="세부 설명을 입력하세요"></textarea>
+
+    <button class="report_button" onclick="openModal()">신고하기</button>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <h2>신고 유형을 선택하세요</h2>
+            <button onclick="submitReport('자전거')">자전거</button>
+            <button onclick="submitReport('킥보드')">킥보드</button>
+        </div>
+    </div>
+
+    <div class="navbar">
+        <div class="navbar-item">
+            <img src="home_icon.png" alt="홈" onclick="goHome()">
+            <p>홈</p>
+        </div>
+               
+        <div class="navbar-item">
+            <img src="menu_icon.png" alt="메뉴" onclick="menu()">
+            <p>메뉴</p>
+        </div>
+        
+    </div>
+
+    <script>
+        function initMap() {
+            var geocoder = new google.maps.Geocoder();
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    var map = new google.maps.Map(document.getElementById('map'), {
+                        center: userLocation,
+                        zoom: 15
+                    });
+
+                    var marker = new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: '현재 위치'
+                    });
+
+                    geocoder.geocode({ 'location': userLocation }, function (results, status) {
+                        if (status === 'OK') {
+                            if (results[0]) {
+                                document.getElementById('address').innerText = results[0].formatted_address;
+                            } else {
+                                alert('주소를 찾을 수 없습니다!!!');
+                            }
+                        } else {
+                            alert('주소를 읽을 수 없습니다!!! ' + status);
+                        }
+                    });
+                }, function () {
+                    handleLocationError(true);
+                });
+            } else {
+                handleLocationError(false);
+            }
+        }
+
+        function handleLocationError(browserHasGeolocation) {
+            alert(browserHasGeolocation ? "오류: 위치정보 확인 불가능" : "위치 정보를 지원하지 않습니다.");
+        }
+
+        window.onload = initMap;
+
+        function goHome() {
+            alert('홈으로 이동합니다!');
+            window.location.href = 'UI.html';
+        }
+
+        
+        
+
+        function menu() { alert('메뉴화면으로 이동합니다.'); window.location.href = 'menu.html'; }
+
+        function openModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'block';
+        }
+
+        function submitReport(reportType) {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+        
+            const address = document.getElementById('address').innerText;
+            const description = document.getElementById('description').value;
+            const imageInput = document.getElementById('chooseFile');
+            const imageFile = imageInput.files[0];
+        
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            
+            if (!loggedInUser) {
+                alert('로그인이 필요합니다. 로그인 후 다시 시도해 주세요.');
+                return;
+            }
+        
+            if (!description) {
+                alert("세부 설명을 입력해 주세요.");
+                return;
+            }
+        
+            const formData = new FormData();
+            formData.append('address', address);
+            formData.append('description', description);
+            formData.append('reportType', reportType);
+            formData.append('userId', loggedInUser); 
+            if (imageFile) {
+                formData.append('chooseFile', imageFile);
+            }
+        
+            fetch('http://127.0.0.1:3000/submit-report', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('서버 요청이 실패했습니다: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => alert(data.message))
+            .catch(error => {
+                console.error('Error:', error);
+                alert('신고 제출 중 오류가 발생했습니다. 다시 시도해 주세요.');
+            });
+        }
+        
+    </script>
+</body>
+</html>

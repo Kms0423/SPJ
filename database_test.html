@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid;
+        }
+    </style>
+</head>
+<body>
+    <h1>Firebase EXAMPLE</h1><br />
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-firestore.js"></script>
+    <script>
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDQa1E9VdM0kcIrp8_TqYNF1EdiPshtaSc",
+        authDomain: "softwareproject2-4e1af.firebaseapp.com",
+        databaseURL: "https://softwareproject2-4e1af-default-rtdb.firebaseio.com",
+        projectId: "softwareproject2-4e1af",
+        storageBucket: "softwareproject2-4e1af.appspot.com",
+        messagingSenderId: "464612569406",
+        appId: "1:464612569406:web:d9a63971429dc28adafc6f"
+      };
+    
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      
+      // 데이터베이스 변수
+      const database = firebase.database();
+      
+      // 데이터 저장
+      database.ref('students').set({
+          "full_name": "Andrew",
+          "age": 17,
+          "grade": "A"
+      });
+    </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신고 관리 페이지</title>
+    <style>
+        .report-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            margin: 20px;
+        }
+        .report-item {
+            width: 50%; 
+            margin: 10px;
+            border: 2px solid #333;
+            padding: 10px; 
+            display: flex;
+            flex-wrap: wrap;
+            box-sizing: border-box;
+        }
+        .report-item img {
+            width: 120px; 
+            height: 120px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .report-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .report-details p {
+            font-size: 14px; 
+            margin: 3px 0; 
+        }
+        .button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            background-color: green;
+            color: white;
+        }
+        .pagination {
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            width: 100%; 
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            box-sizing: border-box;
+            padding: 0 20px; 
+            pointer-events: none;
+        }
+        
+        .pagination button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            pointer-events: all;
+        }
+        
+        .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        
+        
+        
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        .navbar img {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+        .navbar img:hover {
+            background-color: #ddd;
+            border-radius: 50%;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1>신고 관리 페이지</h1>
+    <div class="report-container" id="reportsContainer"></div>
+    <div class="pagination">
+        <button id="prevPageButton" onclick="changePage(-1)" disabled>이전</button>
+        <span id="pageIndicator"></span>
+        <button id="nextPageButton" onclick="changePage(1)" disabled>다음</button>
+    </div>
+
+    <div class="navbar">
+        <img src="home.png" alt="홈" onclick="goHome()">
+        <img src="go_back.png" alt="뒤로가기" onclick="goBack()">
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQA1E9VdM0kcIrp8_TqYNF1EdiPshtaSc",
+            authDomain: "softwareproject2-4e1af.firebaseapp.com",
+            databaseURL: "https://softwareproject2-4e1af-default-rtdb.firebaseio.com/",
+            projectId: "softwareproject2-4e1af",
+            storageBucket: "softwareproject2-4e1af.appspot.com",
+            messagingSenderId: "464612569406",
+            appId: "1:464612569406:web:d9a63971429dc28adafc6cf",
+            measurementId: "G-2800CRF5SM"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const reportsContainer = document.getElementById('reportsContainer');
+        const prevPageButton = document.getElementById('prevPageButton');
+        const nextPageButton = document.getElementById('nextPageButton');
+        const pageIndicator = document.getElementById('pageIndicator');
+
+        let reports = [];
+        let currentPage = 0;
+        const pageSize = 5;
+
+        const loggedInUser = sessionStorage.getItem('loggedInUser');
+        if (!loggedInUser) {
+            alert('로그인이 필요합니다.');
+            window.location.href = 'login.html';
+        }
+
+    
+
+        function loadReports() {
+            database.ref('reports').orderByChild('timestamp').once('value', snapshot => {
+                reports = [];
+                snapshot.forEach(childSnapshot => {
+                    reports.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                });
+                reports.reverse(); 
+                renderPage();
+            });
+        }
+
+        function renderPage() {
+            reportsContainer.innerHTML = ''; 
+            const startIndex = currentPage * pageSize;
+            const endIndex = startIndex + pageSize;
+
+            const currentReports = reports.slice(startIndex, endIndex);
+            currentReports.forEach(report => {
+                const reportItem = document.createElement('div');
+                reportItem.classList.add('report-item');
+
+                const img = document.createElement('img');
+                img.src = report.imageUrl || 'placeholder-image.png';
+
+                const reportDetails = document.createElement('div');
+                reportDetails.classList.add('report-details');
+                reportDetails.innerHTML = `
+                    <p><strong>신고번호:</strong> ${report.reportNumber}</p>
+                    <p><strong>주소:</strong> ${report.address}</p>
+                    <p><strong>설명:</strong> ${report.description}</p>
+                    <p><strong>유형:</strong> ${report.reportType}</p>
+                    <p><strong>신고자 ID:</strong> ${report.userId}</p>
+                    <p><strong>접수 시간:</strong> ${new Date(report.timestamp).toLocaleString()}</p>
+                    <p><strong>상태:</strong> ${report.status} ${report.updatedBy ? `(${report.updatedBy})` : ''}</p>
+                    
+                    ${report.status !== '접수' ? `
+                        <button class="button" onclick="resetStatus('${report.id}')">접수로 변경</button>
+                    ` : ''}
+                    ${report.status === '접수' || report.status ==='처리 완료'? `
+                        <button class="button" onclick="updateStatus_processing('${report.id}')">처리중으로 변경</button>
+                    ` : ''}
+                    ${report.status === '접수' || report.status === '처리중' ? `
+                        <button class="button" onclick="updateStatus_completed('${report.id}')">처리 완료로 변경</button>
+                    ` : ''}
+                `;
+                reportItem.appendChild(img);
+                reportItem.appendChild(reportDetails);
+                reportsContainer.appendChild(reportItem);
+            });
+            
+            prevPageButton.disabled = currentPage === 0;
+            nextPageButton.disabled = endIndex >= reports.length;
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            renderPage();
+        }
+
+        function resetStatus(reportId) {
+            const completedTimestamp = new Date().getTime();
+            database.ref(`reports/${reportId}`).update({
+                status: '접수',
+                completedTimestamp: completedTimestamp,
+                updatedBy: null
+            }).then(() => {
+                alert('신고가 접수로 변경되었습니다.');
+                loadReports(); 
+            });
+        }
+
+        function updateStatus_processing(reportId) {
+            const completedTimestamp = new Date().getTime();
+            database.ref(`reports/${reportId}`).update({
+                status: '처리중',
+                completedTimestamp: completedTimestamp,
+                updatedBy: loggedInUser
+            }).then(() => {
+                alert('신고가 처리중으로 변경되었습니다.');
+                loadReports(); 
+            });
+        }
+
+        
+
+        function updateStatus_completed(reportId) {
+            const completedTimestamp = new Date().getTime();
+            database.ref(`reports/${reportId}`).update({
+                status: '처리 완료',
+                completedTimestamp: completedTimestamp
+            }).then(() => {
+                alert('신고가 처리 완료로 변경되었습니다.');
+                loadReports(); 
+            });
+        }
+
+        function goHome() {
+            alert('홈으로 이동합니다!');
+            window.location.href = 'UI.html';
+        }
+
+        function goBack() {
+            alert('뒤로 가기');
+            window.history.back();
+        }
+
+        window.onload = loadReports;
+    </script>
+</body>
+</html>

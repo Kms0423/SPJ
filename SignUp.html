@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+        .navbar {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 0;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .navbar-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .navbar-item p {
+            margin: 0;
+        }
+
+        .navbar-item img:hover,
+        .navbar-item p:hover {
+            color: #ddd;
+        }
+
+
+        *{
+            padding: 0;
+            margin: 0;
+            border: none;
+        }
+
+        body{
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        .content {
+            display: flex;
+            justify-content: center;
+            gap: 20px; 
+            margin-top: 50px;
+        }
+
+        .normal-member, .local-govern-member {
+            width: 250px;
+            padding: 20px;
+            font-size: 20px; 
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .normal-member{
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 100px 80px; 
+            font-size: 30px; 
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .local-govern-member{
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 100px 70px; 
+            font-size: 30px; 
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>회원가입 유형 선택</h1>
+    
+    <div class="content">
+        <button class="normal-member" onclick="Normal_SignUp()">일반 회원</button>
+        <button class="local-govern-member" onclick="LocalGovern_SignUp()">지자체 회원</button>
+    </div>
+
+    <div class="navbar">
+        <div class="navbar-item">
+            <img src="home_icon.png" alt="홈" onclick="goHome()">
+            <p>홈</p>
+        </div>
+              
+        <div class="navbar-item">
+            <img src="menu_icon.png" alt="메뉴" onclick="menu()">
+            <p>메뉴</p>
+        </div>
+        
+    </div>
+
+    <script>
+        function goHome() {
+            alert('홈으로 이동합니다!');
+            window.location.href = 'UI.html';
+        }
+
+        function menu() { alert('메뉴화면으로 이동합니다.'); window.location.href = 'menu.html'; }
+
+        function Normal_SignUp() {
+            window.location.href ='Normal_SignUp.html';
+        }
+        function LocalGovern_SignUp() {
+            window.location.href ='LocalGovern_SignUp.html';
+        }
+    </script>
+</body>
+</html>

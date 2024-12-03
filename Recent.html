@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최근 신고 내역</title>
+    <style>
+        .report-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            margin: 20px;
+        }
+        .report-item {
+            width: 50%; 
+            margin: 10px;
+            border: 2px solid #333;
+            padding: 10px; 
+            display: flex;
+            flex-wrap: wrap;
+            box-sizing: border-box;
+        }
+        .report-item img {
+            width: 120px; 
+            height: 120px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .report-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .report-details p {
+            font-size: 14px; 
+            margin: 3px 0; 
+        }
+        .navbar {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #333;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 0;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .navbar-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .navbar-item p {
+            margin: 0;
+        }
+
+        .navbar-item img:hover,
+        .navbar-item p:hover {
+            color: #ddd;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .pagination {
+            position: absolute; 
+            top: 50%;
+            transform: translateY(-50%); 
+            width: 100%; 
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            box-sizing: border-box;
+            padding: 0 20px;
+            pointer-events: none; 
+        }
+        
+        .pagination button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            pointer-events: all; 
+        }
+        
+        .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>최근 신고 내역</h1>
+    <div class="report-container" id="reportContainer"></div>
+    <div class="pagination">
+        <button id="prevPageButton" onclick="changePage(-1)" disabled>이전</button>
+        <button id="nextPageButton" onclick="changePage(1)" disabled>다음</button>
+    </div>
+    <div class="navbar">
+        <div class="navbar-item">
+            <img src="home_icon.png" alt="홈" onclick="goHome()">
+            <p>홈</p>
+        </div>
+        
+        <div class="navbar-item">
+            <img src="profile_icon.png" id="auth-button-img"alt="로그인" onclick="goLogin()">
+            <p id="auth-button">로그인</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQA1E9VdM0kcIrp8_TqYNF1EdiPshtaSc",
+            authDomain: "softwareproject2-4e1af.firebaseapp.com",
+            databaseURL: "https://softwareproject2-4e1af-default-rtdb.firebaseio.com/",
+            projectId: "softwareproject2-4e1af",
+            storageBucket: "softwareproject2-4e1af.appspot.com",
+            messagingSenderId: "464612569406",
+            appId: "1:464612569406:web:d9a63971429dc28adafc6cf",
+            measurementId: "G-2800CRF5SM"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+
+        let reports = [];
+        let currentPage = 0;
+        const pageSize = 5;
+
+        function loadReports() {
+            database.ref('reports').orderByChild('timestamp').once('value', function(snapshot) {
+                reports = [];
+                snapshot.forEach(function(childSnapshot) {
+                    reports.push(childSnapshot.val());
+                });
+                reports.reverse();
+                renderPage();
+            });
+        }
+
+        function renderPage() {
+            const reportContainer = document.getElementById('reportContainer');
+            reportContainer.innerHTML = ''; 
+
+            const startIndex = currentPage * pageSize;
+            const endIndex = startIndex + pageSize;
+            const currentReports = reports.slice(startIndex, endIndex);
+
+            currentReports.forEach(report => {
+                const reportItem = document.createElement('div');
+                reportItem.classList.add('report-item');
+
+                const img = document.createElement('img');
+                img.src = report.imageUrl || 'placeholder-image.png';
+
+                const reportDetails = document.createElement('div');
+                reportDetails.classList.add('report-details');
+                const processingTime = calculateProcessingTime(report.timestamp, report.completedTimestamp, report.status);
+
+                reportDetails.innerHTML = `
+                    <p><strong>신고번호:</strong> ${report.reportNumber}</p>
+                    <p><strong>주소:</strong> ${report.address}</p>
+                    <p><strong>설명:</strong> ${report.description}</p>
+                    <p><strong>유형:</strong> ${report.reportType}</p>
+                    <p><strong>상태:</strong> ${report.status}</p>
+                    <p><strong>신고자 ID:</strong> ${report.userId}</p>
+                    <p><strong>처리 시간:</strong> ${processingTime}</p>
+                `;
+
+                reportItem.appendChild(img);
+                reportItem.appendChild(reportDetails);
+                reportContainer.appendChild(reportItem);
+            });
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            document.getElementById('prevPageButton').disabled = currentPage === 0;
+            document.getElementById('nextPageButton').disabled = (currentPage + 1) * pageSize >= reports.length;
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            renderPage();
+        }
+
+        function calculateProcessingTime(timestamp, completedTimestamp, status) {
+            if (status === '처리 완료' && completedTimestamp) {
+                const timeDifference = completedTimestamp - timestamp;
+                const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                return hours > 0 ? `${hours}시간 ${minutes}분 소요` : `${minutes}분 소요`;
+            } else if (status === '접수') {
+                const now = new Date().getTime();
+                const timeDifference = now - timestamp;
+                const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                return hours > 0 ? `${hours}시간 ${minutes}분째 접수 중` : `${minutes}분째 접수 중`;
+            } else {
+                return '시간 정보 없음';
+            }
+        }
+
+        window.onload = function () {
+            loadReports();
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            const userType = sessionStorage.getItem('userType'); 
+            const authButton = document.getElementById('auth-button');
+            const authButtonImg = document.getElementById('auth-button-img');
+            
+
+        
+            if (loggedInUser) {
+                authButton.innerText = '로그아웃';
+                authButton.onclick = function () {
+                    sessionStorage.removeItem('loggedInUser');
+                    sessionStorage.removeItem('userType'); 
+                    alert('로그아웃되었습니다.');
+                    window.location.href = 'UI.html';  
+                };
+                authButtonImg.onclick = authButton.onclick;
+        
+                profileButton.onclick = function() {
+                    window.location.href = 'Profile.html';
+                };
+        
+                if (userType === 'localgovern_user') {
+                    reportOrManageButtonText.innerText = '신고 관리 페이지로 이동';
+                    reportOrManageButtonImg.onclick = function () {
+                        window.location.href = 'Management2.html';
+                    };
+                } else if (userType === 'normal_user') {
+                    reportOrManageButtonText.innerText = '신고하기';
+                    reportOrManageButtonImg.onclick = function () {
+                        window.location.href = 'Report.html';
+                    };
+                }
+        
+                
+                reportOrManageButtonText.innerText = '신고하기';
+                reportOrManageButtonImg.onclick = function () {
+                    alert('로그인이 필요합니다!');
+                    window.location.href = 'Login.html';
+                };
+                
+                reportOrManageButtonText.onclick = function () {
+                    alert('로그인이 필요합니다!');
+                    window.location.href = 'Login.html';
+                };
+            } else {
+                reportOrManageButtonText.innerText = '신고하기';
+                reportOrManageButtonImg.onclick = function () {
+                    alert('로그인이 필요합니다!');
+                    window.location.href = 'Login.html';
+                };
+                
+                reportOrManageButtonText.onclick = function () {
+                    alert('로그인이 필요합니다!');
+                    window.location.href = 'Login.html';
+                };
+                authButton.innerText = '로그인';
+                authButton.onclick = function () {
+                    window.location.href = 'Login.html'; 
+                };
+        
+                profileButton.onclick = function() {
+                    alert('로그인이 필요합니다.');
+                    window.location.href = 'Login.html';
+                };
+        
+                if (notificationContainer) {
+                    notificationContainer.style.display = 'none';
+                }
+            }
+        };
+
+        function goHome() { alert('홈으로 이동합니다!'); window.location.href = 'UI.html'; }
+        function goLogin() { alert('로그인 화면으로 이동합니다!'); window.location.href = 'login.html'; }
+        function goBack() { alert('뒤로 가기'); window.history.back(); }
+        function menu() { alert('메뉴화면으로 이동합니다.'); window.location.href = 'menu.html'; }
+        function profile() { alert('프로필 화면으로 이동합니다.'); window.location.href = 'Profile_Test.html'; }
+        function goRecent() { window.location.href = 'Recent.html'; }
+        function goToRanking() { window.location.href = 'Ranking.html'; }
+
+        
+    </script>
+</body>
+</html>
