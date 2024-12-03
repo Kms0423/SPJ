@@ -5,7 +5,9 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 
-const serviceAccount = require('./serviceAccountKey.json');
+require('dotenv').config();
+
+const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
 
 if (!admin.apps.length) {
   admin.initializeApp({
